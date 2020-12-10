@@ -19,16 +19,15 @@ def helper(blocks, block_index, to_color, line, options, line_index):
 
     block_length = blocks[block_index]
 
-    for i in range(len(line)):
+    for i in range(line_index, len(line)):
         if i + block_length > len(line):
             return
         line[i: i + block_length] = [1 for i in range(block_length)]
         to_color -= block_length
         block_index += 1
-        helper(blocks, block_index, to_color, line, options, line_index + 2)
+        helper(blocks, block_index, to_color, line, options, i + 2)
         block_index -= 1
         line[i: i + block_length] = [0 for i in range(block_length)]
         to_color += block_length
-
 
 print(constraint_satisfactions(2, [1]))
