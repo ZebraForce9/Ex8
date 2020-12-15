@@ -51,7 +51,7 @@ def legal_row(row, blocks):
 
 
 def row_variations(row, blocks):
-    to_color = sum(blocks) - row.count(1)
+    to_color = sum(blocks)
     options = []
     row_copy = row[:]
 
@@ -77,13 +77,13 @@ def variations_helper(row_original, row_copy, row_index, blocks, block_index, to
             continue
 
         row_copy[i: i + block_length] = [1 for i in range(block_length)]
-        to_color = sum(blocks) - row_copy.count(1)
+        to_color -= block_length
         block_index += 1
 
         variations_helper(row_original, row_copy, i + block_length + 1, blocks, block_index, to_color, options)
 
         row_copy[i: i + block_length] = row_original[i: i + block_length]
-        to_color = sum(blocks) - row_copy.count(1)
+        to_color += block_length
         block_index -= 1
 
 
@@ -104,7 +104,7 @@ def is_legal_coloring(i, row_copy, block_length):
 
 def check_to_color(to_color, row_copy, row_index, blocks, block_index, options):
     if to_color == 0:
-        if block_index == len(blocks):
+        if block_index == len(blocks) and row_copy.count(1) == sum(blocks):
             row_copy_copy = [0 if square == -1 or square == 0 else 1 for square in row_copy]
 
             options.append(row_copy_copy)
@@ -164,8 +164,6 @@ def solve_easy_nonogram(constraints):
                     board[row_ind][col_ind] = square2
                     unknown_count -= 1
                     changed = True
-                # elif square1 != -1 and square1 != square2:
-                #     return
 
         if unknown_count == 0 or changed is False:
             break
@@ -184,7 +182,8 @@ def solve_easy_nonogram(constraints):
 
             if changed is False:
                 break
-                # elif square1 != -1 and square1 != square2:
-                #     return
 
     return board
+
+
+
