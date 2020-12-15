@@ -62,6 +62,7 @@ def row_variations(row, blocks):
 
 
 def variations_helper(row_original, row_copy, row_index, blocks, block_index, to_color, options):
+
     if check_to_color(to_color, row_copy, row_index, blocks, block_index, options):
         return
 
@@ -103,9 +104,10 @@ def is_legal_coloring(i, row_copy, block_length):
 
 def check_to_color(to_color, row_copy, row_index, blocks, block_index, options):
     if to_color == 0:
-        row_copy_copy = [0 if square == -1 or square == 0 else 1 for square in row_copy]
+        if block_index == len(blocks):
+            row_copy_copy = [0 if square == -1 or square == 0 else 1 for square in row_copy]
 
-        options.append(row_copy_copy)
+            options.append(row_copy_copy)
         return True
 
     if to_color < 0:
@@ -113,6 +115,7 @@ def check_to_color(to_color, row_copy, row_index, blocks, block_index, options):
 
     elif row_index >= len(row_copy) or block_index >= len(blocks):
         return True
+
 
 def intersection_row(rows):
     square_intersection = zip(*rows)
@@ -185,7 +188,3 @@ def solve_easy_nonogram(constraints):
                 #     return
 
     return board
-
-
-if __name__ == '__main__':
-    print(row_variations([-1, -1, -1, -1, 1, -1, -1, -1, -1, -1], [1, 1, 2]))
