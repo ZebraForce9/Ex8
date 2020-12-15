@@ -62,15 +62,6 @@ def row_variations(row, blocks):
 
 
 def variations_helper(row_original, row_copy, row_index, blocks, block_index, to_color, options):
-    # if to_color == 0:
-    #     row_copy_copy = [0 if square == -1 or square == 0 else 1 for square in row_copy]
-    #
-    #     options.append(row_copy_copy)
-    #     return
-    #
-    # if row_index >= len(row_copy) or block_index >= len(blocks) or row_copy.count(1) > sum(blocks):
-    #     return
-
     if check_to_color(to_color, row_copy, row_index, blocks, block_index, options):
         return
 
