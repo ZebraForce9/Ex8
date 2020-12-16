@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 def constraint_satisfactions(n, blocks):
     to_color = sum(blocks)
     options = []
@@ -96,7 +98,7 @@ def is_legal_coloring(i, row_copy, block_length):
         if row_copy[i - 1] == 1:
             return False
 
-    if 0 in row_copy[i: i + block_length]: # or -1 not in row_copy[i: i + block_length]
+    if 0 in row_copy[i: i + block_length]:
         return False
 
     return True
@@ -134,26 +136,13 @@ def intersection_row(rows):
 
 
 def solve_easy_nonogram(constraints):
-    row_constraints = constraints[0]
-    col_constraints = constraints[1]
-
-    board = []
-
-    row_length = len(constraints[1])
-
-    unknown_count = 0
-
-    for constraint in row_constraints:
-        row_options = constraint_satisfactions(row_length, constraint)
-        row_intersection = intersection_row(row_options)
-        board.append(row_intersection)
-        unknown_count += row_intersection.count(-1)
+    board, col_constraints, row_constraints, unknown_count = initialize_game(constraints)
 
     while unknown_count > 0:
         changed = False
 
         for col_ind, constraint in enumerate(col_constraints):
-            col = [row[col_ind] for row in board]
+            col = make_col(col_ind, board)
             col_options = row_variations(col, constraint)
             col_intersection = intersection_row(col_options)
             if not col_intersection:
@@ -184,6 +173,77 @@ def solve_easy_nonogram(constraints):
                 break
 
     return board
+
+
+def initialize_game(constraints):
+    row_constraints = constraints[0]
+    col_constraints = constraints[1]
+    board = []
+    row_length = len(constraints[1])
+    unknown_count = 0
+    for constraint in row_constraints:
+        row_options = constraint_satisfactions(row_length, constraint)
+        row_intersection = intersection_row(row_options)
+        board.append(row_intersection)
+        unknown_count += row_intersection.count(-1)
+    return board, col_constraints, row_constraints, unknown_count
+
+
+def solve_nonogram(constraints):
+    row_constraints = constraints[0]
+    col_constraints = constraints[1]
+    solutions = []
+    board = solve_easy_nonogram(constraints)
+    row_length = len(board[0])
+    solve_nonogram_helper(board, row_constraints, col_constraints, solutions, row_length)
+
+    return solutions
+
+
+def solve_nonogram_helper(board, row_constraints, col_constraints, solutions, row_length):
+    col_index = find_col_index(board)
+
+    if col_index == row_length:
+        board_copy = deepcopy(board)
+        solutions.append(board_copy)
+        return
+
+    col = make_col(col_index, board)
+    col_variations = row_variations(col, col_constraints[col_index])
+    for variation in col_variations:
+        insert_col(board, col_index, variation)
+        if check_rows(board, row_constraints):
+            solve_nonogram_helper(board, row_constraints, col_constraints, solutions, row_length)
+        insert_col(board, col_index, col)
+
+
+def check_rows(board, row_constraints):
+    for i, row in enumerate(board):
+        if not row_variations(row, row_constraints[i]):
+            return False
+    return True
+
+
+def insert_col(board, col_index, variation):
+    for row_index, square in enumerate(variation):
+        board[row_index][col_index] = square
+
+
+def make_col(col_index, board):
+    col = [row[col_index] for row in board]
+    return col
+
+
+def find_col_index(board):
+    lowest_index = len(board[0])
+
+    for row in board:
+        for i, square in enumerate(row):
+            if square == -1 and i < lowest_index:
+                lowest_index = i
+    return lowest_index
+
+
 
 
 
